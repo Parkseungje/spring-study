@@ -28,11 +28,7 @@ public class JwtTokenProvider {
     public String generateToken(String email, String password) {
 
 //        Claims claims = Jwts.claims().setSubject(email);
-        UserDetails userDetails = userPrincipalService.loadUserByUsernameAndPassword(email, password).orElseThrow(
-                () -> {
-                    throw new RuntimeException();
-                }
-        );
+        UserDetails userDetails = userPrincipalService.loadUserByUsernameAndPassword(email, password);
         Date now = new Date();
         Date expiresIn = new Date(now.getTime() + expireTime);
 
