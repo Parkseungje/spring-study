@@ -28,6 +28,8 @@ public class UserService {
         builder.name(userRequest.getName());
         builder.email(userRequest.getEmail());
         builder.password(userRequest.getPassword());
+        builder.bio(userRequest.getBio());
+        builder.image(userRequest.getImage());
 
         User build = builder.build();
 
