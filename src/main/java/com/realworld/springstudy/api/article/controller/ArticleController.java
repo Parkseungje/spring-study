@@ -27,9 +27,6 @@ public class ArticleController {
 
     @PostMapping("/articles")
     public void addArticles(@RequestBody ArticleRequest articleRequest){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
-        System.out.println(principal.getUsername());
         articleService.addArticles(articleRequest);
 
     }
