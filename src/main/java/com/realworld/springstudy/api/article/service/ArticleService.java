@@ -11,7 +11,9 @@ import com.realworld.springstudy.api.article.entity.Favorite;
 import com.realworld.springstudy.api.article.repository.ArticleRepository;
 import com.realworld.springstudy.api.article.repository.CommentRepository;
 import com.realworld.springstudy.api.article.repository.FavoriteRepository;
+import com.realworld.springstudy.api.tag.service.TagService;
 import com.realworld.springstudy.api.user.entity.User;
+import com.realworld.springstudy.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private final FavoriteRepository favoriteRepository;
+    private final UserService userService;
+    private final TagService tagService;
 
     public void addArticles(ArticleRequest articleRequest) {
         ArticleBuilder builder = Article.builder();
@@ -32,11 +36,12 @@ public class ArticleService {
         builder.description(articleRequest.getDescription());
         builder.title(articleRequest.getTitle());
         builder.body(articleRequest.getBody());
+        builder.author(userService.getCurrentUser());
 
         builder.slug(this.createSlug(articleRequest.getTitle()));
 
         Article build = builder.build(); // use builder entity create
-
+        tagService.addTagList(build, articleRequest.getTagList());
         articleRepository.save(build); // jpa extends auto save
 
     }
