@@ -6,7 +6,11 @@ import com.realworld.springstudy.api.article.dto.CommentRequest;
 import com.realworld.springstudy.api.article.entity.Article;
 import com.realworld.springstudy.api.article.entity.Comment;
 import com.realworld.springstudy.api.article.service.ArticleService;
+import com.realworld.springstudy.api.user.entity.UserPrincipal;
+import com.realworld.springstudy.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +27,9 @@ public class ArticleController {
 
     @PostMapping("/articles")
     public void addArticles(@RequestBody ArticleRequest articleRequest){
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        System.out.println(principal.getUsername());
         articleService.addArticles(articleRequest);
 
     }
