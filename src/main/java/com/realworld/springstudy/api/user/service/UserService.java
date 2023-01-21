@@ -1,10 +1,14 @@
 package com.realworld.springstudy.api.user.service;
 
+import com.realworld.springstudy.api.user.dto.Profile;
 import com.realworld.springstudy.api.user.dto.UserRequest;
 import com.realworld.springstudy.api.user.dto.UserUpdateRequest;
+import com.realworld.springstudy.api.user.entity.Follow;
+import com.realworld.springstudy.api.user.entity.Follow.FollowBuilder;
 import com.realworld.springstudy.api.user.entity.User;
 import com.realworld.springstudy.api.user.entity.User.UserBuilder;
 import com.realworld.springstudy.api.user.entity.UserPrincipal;
+import com.realworld.springstudy.api.user.repository.FollowRepository;
 import com.realworld.springstudy.api.user.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,9 +21,11 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, FollowRepository followRepository) {
         this.userRepository = userRepository;
+        this.followRepository = followRepository;
     }
 
     public void addUsers(UserRequest userRequest){
@@ -73,6 +79,44 @@ public class UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
         return userRepository.findByEmail(principal.getUsername());
+    }
+
+    public Profile getProfile(String username){
+        User user = userRepository.findByName(username);
+
+        Profile profile = new Profile();
+
+        profile.setBio(user.getBio());
+        profile.setUsername(user.getName());
+        profile.setImage(user.getImage());
+        profile.setFollowing(followRepository.existsByFollowee(user));
+
+        return profile;
+    }
+
+    public void followUsers(String username){
+        
+        User followee = userRepository.findByName(username);
+        
+        FollowBuilder builder = Follow.builder();
+
+        builder.followee(followee);
+        builder.follower(this.getCurrentUser());
+
+        Follow build = builder.build();
+        
+        followRepository.save(build);
+    }
+    @Transactional
+    public void unfollowUsers(String username) {
+
+        User followee = userRepository.findByName(username);
+
+        User follower = userRepository.findByName(this.getCurrentUser().getName());
+
+        Follow entity = followRepository.findByFolloweeAndFollower(followee, follower);
+        followRepository.delete(entity);
+
     }
 }
 
