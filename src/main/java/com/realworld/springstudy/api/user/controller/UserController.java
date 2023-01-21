@@ -1,5 +1,6 @@
 package com.realworld.springstudy.api.user.controller;
 
+import com.realworld.springstudy.api.user.dto.Profile;
 import com.realworld.springstudy.api.user.dto.UserRequest;
 import com.realworld.springstudy.api.user.dto.UserUpdateRequest;
 import com.realworld.springstudy.api.user.entity.User;
@@ -31,6 +32,20 @@ public class UserController {
         return userService.getCurrentUser();
     }
 
+    @GetMapping("/profiles/{username}")
+    public Profile getProfile(@PathVariable String username){
+        return userService.getProfile(username);
+    }
+
+    @PostMapping("/profiles/{username}/follow")
+    public void follow(@PathVariable String username){
+        userService.followUsers(username);
+    }
+
+    @DeleteMapping("/profiles/{username}/follow")
+    public void unfollow(@PathVariable String username){
+        userService.unfollowUsers(username);
+    }
 }
 
 
