@@ -2,6 +2,7 @@ package com.realworld.springstudy.api.article.service;
 
 import com.realworld.springstudy.api.article.dto.ArticleRequest;
 
+import com.realworld.springstudy.api.article.dto.ArticleResponse;
 import com.realworld.springstudy.api.article.dto.ArticleUpdateRequest;
 import com.realworld.springstudy.api.article.dto.CommentRequest;
 import com.realworld.springstudy.api.article.entity.Article;
@@ -12,12 +13,14 @@ import com.realworld.springstudy.api.article.repository.ArticleRepository;
 import com.realworld.springstudy.api.article.repository.CommentRepository;
 import com.realworld.springstudy.api.article.repository.FavoriteRepository;
 import com.realworld.springstudy.api.tag.service.TagService;
+import com.realworld.springstudy.api.user.dto.Author;
 import com.realworld.springstudy.api.user.entity.User;
 import com.realworld.springstudy.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,12 +54,37 @@ public class ArticleService {
     }
 
 
-    public List<Article> getArticleListAll() {
-        return articleRepository.findAll();
+    public List<ArticleResponse> getArticleListAll() {
+        List<Article> articleList = articleRepository.findAll();
+        List<ArticleResponse> list = new ArrayList<>();
+        for (Article article : articleList) {
+            ArticleResponse articleResponse = createArticleResponse(article);
+            list.add(articleResponse);
+        }
+        return list;
     }
 
-    public Article getArticleBySlug(String slug) {
-        return articleRepository.findBySlug(slug);
+    private ArticleResponse createArticleResponse(Article article) {
+        ArticleResponse articleResponse = new ArticleResponse();
+        articleResponse.setBody(article.getBody());
+        articleResponse.setDescription(article.getDescription());
+        articleResponse.setCreatedAt(article.getCreatedTime());
+        articleResponse.setUpdatedAt(article.getUpdatedTime());
+        articleResponse.setFavoritesCount(favoriteRepository.countByArticleId(article.getId()).intValue());
+        articleResponse.setSlug(article.getSlug());
+        articleResponse.setTitle(article.getTitle());
+        articleResponse.setFavorited(favoriteRepository.existsByUserAndArticle(article.getAuthor(), article));
+        Author author = new Author();
+        author.setBio(article.getAuthor().getBio());
+        author.setImage(article.getAuthor().getImage());
+        author.setUserName(article.getAuthor().getName());
+        articleResponse.setAuthor(author);
+        return articleResponse;
+    }
+
+    public ArticleResponse getArticleBySlug(String slug) {
+        Article article = articleRepository.findBySlug(slug);
+        return createArticleResponse(article);
     }
 
     @Transactional // 트랜잭션을 하겠다고 명시하는 어노테이션 (begin과 commit 처리를 하겠다는것)
@@ -89,20 +117,12 @@ public class ArticleService {
     public void addComments(String slug, CommentRequest commentRequest){
 
         // comment에 해당하는 article객체를 가져오는
-        Article articleBySlug = this.getArticleBySlug(slug);
-
-        // 가라 데이터(유저 가짜로 만들기)
-        User.UserBuilder userBuilder = User.builder();
-        userBuilder.id(1L);
-        userBuilder.bio("testBio");
-        userBuilder.name("testName");
-        userBuilder.email("test@test.com");
-        userBuilder.password("testPassword");
+        Article articleBySlug = articleRepository.findBySlug(slug);
 
         //Comment 만들기 (빌더로)
         Comment.CommentBuilder builder = Comment.builder();
         builder.article(articleBySlug);
-        builder.author(userBuilder.build());
+        builder.author(userService.getCurrentUser());
         builder.body(commentRequest.getBody());
 
         commentRepository.save(builder.build());
@@ -123,20 +143,13 @@ public class ArticleService {
     }
 
     public void addFavorite(String slug){
-        //TODO 가라 데이터(유저 가짜로 만들기) Spring Security 추가 예정
-        User.UserBuilder userBuilder = User.builder();
-        userBuilder.id(1L);
-        userBuilder.bio("testBio");
-        userBuilder.name("testName");
-        userBuilder.email("test@test.com");
-        userBuilder.password("testPassword");
 
         // 슬러그로 아티클 찾기
         Article article = articleRepository.findBySlug(slug);
 
         // 페이버릿 빌드하기
         Favorite.FavoriteBuilder builder = Favorite.builder();
-        builder.user(userBuilder.build());
+        builder.user(userService.getCurrentUser());
         builder.article(article);
 
         favoriteRepository.save(builder.build());
