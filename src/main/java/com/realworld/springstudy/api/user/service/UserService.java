@@ -4,7 +4,10 @@ import com.realworld.springstudy.api.user.dto.UserRequest;
 import com.realworld.springstudy.api.user.dto.UserUpdateRequest;
 import com.realworld.springstudy.api.user.entity.User;
 import com.realworld.springstudy.api.user.entity.User.UserBuilder;
+import com.realworld.springstudy.api.user.entity.UserPrincipal;
 import com.realworld.springstudy.api.user.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +67,10 @@ public class UserService {
 
     }
 
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        return userRepository.findByEmail(principal.getUsername());
+    }
 }
 
