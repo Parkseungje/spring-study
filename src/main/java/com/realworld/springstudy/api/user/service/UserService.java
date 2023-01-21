@@ -89,7 +89,7 @@ public class UserService {
         profile.setBio(user.getBio());
         profile.setUsername(user.getName());
         profile.setImage(user.getImage());
-        profile.setFollowing(followRepository.existsByUser(user));
+        profile.setFollowing(followRepository.existsByFollowee(user));
 
         return profile;
     }
@@ -107,9 +107,16 @@ public class UserService {
         
         followRepository.save(build);
     }
-
+    @Transactional
     public void unfollowUsers(String username) {
-        followRepository.deleteByName(username);
+
+        User followee = userRepository.findByName(username);
+
+        User follower = userRepository.findByName(this.getCurrentUser().getName());
+
+        Follow entity = followRepository.findByFolloweeAndFollower(followee, follower);
+        followRepository.delete(entity);
+
     }
 }
 

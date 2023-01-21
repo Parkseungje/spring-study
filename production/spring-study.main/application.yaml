@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: study-hard
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: mysecretpassword
+  jpa:
+    hibernate:
+      ddl-auto: update # table auto make and auto drop # command create-drop # command update
+    database: postgresql
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+jwt:
+  token:
+    secretKey: ashdvujeawfgbuaebibguebragiasdgvstfhb
+    expireLength: 360000000

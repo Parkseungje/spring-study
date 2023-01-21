@@ -1,0 +1,89 @@
+create table article
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    body         varchar(255),
+    description  varchar(255),
+    slug         varchar(255),
+    title        varchar(255),
+    author_id    bigint
+);
+
+create table article_tag
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    tag          varchar(255) not null,
+    article_id      bigint       not null
+);
+
+create table "comment"
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    body         varchar(255),
+    article_id   bigint not null,
+    author_id    bigint not null
+);
+
+create table favorite
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    article_id   bigint,
+    user_id      bigint
+);
+
+create table follow
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    followee     bigint not null,
+    follower     bigint not null
+);
+
+create table "user"
+(
+    id           bigserial,
+    created_time timestamp,
+    updated_time timestamp,
+    "name"       varchar(64) not null,
+    email        varchar(64) not null,
+    bio          varchar(64) not null,
+    image        varchar(255) not null,
+    "password"   varchar(255) not null
+);
+
+-- user
+alter table "user" add constraint user_pk primary key(id);
+alter table "user" ADD CONSTRAINT user_name_unique UNIQUE ("name");
+alter table "user" ADD CONSTRAINT user_email_unique UNIQUE ("email");
+
+-- article
+alter table "article" add constraint article_pk primary key(id);
+alter table "article" add constraint article_user_id_fk foreign key (author_id) references "user"(id);
+
+-- article_tag
+alter table "article_tag" add constraint article_tag_pk primary key(id);
+alter table "article_tag" add constraint article_tag_id_fk foreign key (article_id) references article(id);
+
+-- comment
+alter table "comment" add constraint comment_pk primary key(id);
+alter table "comment" add constraint comment_article_id_fk foreign key (article_id) references article(id);
+alter table "comment" add constraint comment_author_id_fk foreign key (author_id) references "user"(id);
+
+-- favorite
+alter table "favorite" add constraint favorite_pk primary key(id);
+alter table "favorite" add constraint favorite_user_id_fk foreign key (user_id) references "user"(id);
+alter table "favorite" add constraint favorite_article_id_fk foreign key (article_id) references article(id);
+
+-- follow
+alter table "follow" add constraint follow_pk primary key(id);
+alter table "follow" add constraint followee_user_id_fk foreign key (followee) references "user"(id);
+alter table "follow" add constraint follower_user_id_fk foreign key (follower) references "user"(id);
+alter table "follow" ADD CONSTRAINT follow_followee_pair_must_be_unique UNIQUE (followee, follower);
