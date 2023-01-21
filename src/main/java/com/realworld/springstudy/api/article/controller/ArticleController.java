@@ -1,16 +1,11 @@
 package com.realworld.springstudy.api.article.controller;
 
 import com.realworld.springstudy.api.article.dto.ArticleRequest;
+import com.realworld.springstudy.api.article.dto.ArticleResponse;
 import com.realworld.springstudy.api.article.dto.ArticleUpdateRequest;
 import com.realworld.springstudy.api.article.dto.CommentRequest;
-import com.realworld.springstudy.api.article.entity.Article;
 import com.realworld.springstudy.api.article.entity.Comment;
 import com.realworld.springstudy.api.article.service.ArticleService;
-import com.realworld.springstudy.api.user.entity.UserPrincipal;
-import com.realworld.springstudy.global.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,17 +27,15 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public List<Article> getArticles() {
+    public List<ArticleResponse> getArticles() {
 
         return articleService.getArticleListAll();
     }
 
     @GetMapping("/articles/{slug}")
-    public Article getArticleBySlug(@PathVariable String slug){
+    public ArticleResponse getArticleBySlug(@PathVariable String slug){
 
-        Article articleBySlug = articleService.getArticleBySlug(slug);
-
-        return articleBySlug;
+        return articleService.getArticleBySlug(slug);
     }
 
     @PutMapping("/articles/{slug}")
