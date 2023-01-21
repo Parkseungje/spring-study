@@ -13,6 +13,6 @@ public class LoginService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public String login(LoginDto loginDto) {
-        return jwtTokenProvider.generateToken(loginDto.getEmail());
+        return jwtTokenProvider.generateToken(loginDto.getEmail(), loginDto.getPassword());
     }
 }

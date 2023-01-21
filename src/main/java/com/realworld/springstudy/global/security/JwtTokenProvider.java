@@ -25,15 +25,19 @@ public class JwtTokenProvider {
 
     private final UserPrincipalService userPrincipalService;
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String password) {
 
 //        Claims claims = Jwts.claims().setSubject(email);
-
+        UserDetails userDetails = userPrincipalService.loadUserByUsernameAndPassword(email, password).orElseThrow(
+                () -> {
+                    throw new RuntimeException();
+                }
+        );
         Date now = new Date();
         Date expiresIn = new Date(now.getTime() + expireTime);
 
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiresIn)
                 .signWith(SignatureAlgorithm.HS256, secretKey)

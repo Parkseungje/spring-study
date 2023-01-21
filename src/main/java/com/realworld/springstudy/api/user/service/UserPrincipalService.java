@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class UserPrincipalService {
@@ -18,5 +20,11 @@ public class UserPrincipalService {
         User user = userRepository.findByEmail(email);
         UserPrincipal userPrincipal = UserPrincipal.create(user);
         return userPrincipal;
+    }
+
+    public Optional<UserDetails> loadUserByUsernameAndPassword(String email, String password) {
+        User user = userRepository.findByEmailAndPassword(email, password);
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+        return Optional.of(userPrincipal);
     }
 }
