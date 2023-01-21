@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +25,9 @@ public class TagService {
             tagList.add(builder.build());
         }
         tagRepository.saveAll(tagList);
+    }
+
+    public List<String> getTagList(Article article) {
+        return tagRepository.findByArticle(article).stream().map(ArticleTag::getTag).collect(Collectors.toList());
     }
 }

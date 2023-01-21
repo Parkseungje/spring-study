@@ -73,6 +73,7 @@ public class ArticleService {
         articleResponse.setFavoritesCount(favoriteRepository.countByArticleId(article.getId()).intValue());
         articleResponse.setSlug(article.getSlug());
         articleResponse.setTitle(article.getTitle());
+        articleResponse.setTagList(tagService.getTagList(article));
         articleResponse.setFavorited(favoriteRepository.existsByUserAndArticle(article.getAuthor(), article));
         Author author = new Author();
         author.setBio(article.getAuthor().getBio());
